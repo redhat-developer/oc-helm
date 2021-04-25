@@ -1,0 +1,65 @@
+package action
+
+import (
+	"fmt"
+	"text/tabwriter"
+	"time"
+
+	"github.com/redhat-cop/oc-helm/pkg/client"
+
+	"github.com/redhat-cop/oc-helm/pkg/options"
+)
+
+type HistoryAction struct {
+	commandLineOptions *options.CommandLineOption
+	helmChartClient    *client.HelmChartClient
+}
+
+func NewHistoryAction(commandLineOptions *options.CommandLineOption) *HistoryAction {
+	return &HistoryAction{
+		commandLineOptions: commandLineOptions,
+	}
+}
+
+func (h *HistoryAction) BuildHelmChartClient() error {
+
+	if err := h.commandLineOptions.Process(); err != nil {
+		return err
+	}
+
+	helmChartClient, err := client.NewHelmChartClient(h.commandLineOptions)
+
+	if err != nil {
+		return err
+	}
+
+	h.helmChartClient = helmChartClient
+
+	return nil
+
+}
+
+func (h *HistoryAction) Run(releaseName string) error {
+
+	releases, err := h.helmChartClient.History(releaseName)
+
+	if err != nil {
+		return err
+	}
+
+	w := tabwriter.NewWriter(h.commandLineOptions.Streams.Out, 0, 8, 1, '\t', tabwriter.AlignRight)
+
+	fmt.Fprintln(w, "REVISION\tUPDATED\tSTATUS\tCHART\tAPP VERSION\tDESCRIPTION")
+
+	for _, release := range *releases {
+		fmt.Fprintf(w, "%d\t%s\t%s\t%s\t%s\t%s", release.Version, release.Info.LastDeployed.Format(time.ANSIC), release.Info.Status, fmt.Sprintf("%s-%s", release.Chart.Metadata.Name, release.Chart.Metadata.Version), release.Chart.AppVersion(), release.Info.Description)
+
+		fmt.Fprint(w, "\n")
+
+	}
+
+	w.Flush()
+
+	return nil
+
+}
