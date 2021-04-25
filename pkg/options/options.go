@@ -20,6 +20,10 @@ type CommandLineOption struct {
 	ChartRepository string
 	Context         string
 	Version         string
+	ValueFiles      []string
+	StringValues    []string
+	Values          []string
+	FileValues      []string
 }
 
 func NewCommandLineOption() *CommandLineOption {

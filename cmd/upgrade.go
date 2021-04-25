@@ -24,15 +24,15 @@ import (
 	"github.com/spf13/cobra"
 )
 
-func newInstallCmd(commandLineOptions *options.CommandLineOption) *cobra.Command {
+func newUpgradeCmd(commandLineOptions *options.CommandLineOption) *cobra.Command {
 
-	action := action.NewInstallAction(commandLineOptions)
+	action := action.NewUpgradeAction(commandLineOptions)
 
-	// installCmd represents the install command
-	installCmd := &cobra.Command{
-		Use:   "install [NAME] [REPOSITORY/NAME]",
-		Short: "Install chart",
-		Long:  `Install chart`,
+	// upgradeCmd represents the upgrade command
+	upgradeCmd := &cobra.Command{
+		Use:   "upgrade [NAME] [REPOSITORY/NAME]",
+		Short: "Upgrade a release",
+		Long:  "Upgrade a release",
 		PreRunE: func(c *cobra.Command, args []string) error {
 			if len(args) != 2 {
 				return fmt.Errorf("Error: Must provide a release name and reference to chart within a repository")
@@ -56,12 +56,11 @@ func newInstallCmd(commandLineOptions *options.CommandLineOption) *cobra.Command
 			}
 
 			return action.Run(args[0], args[1])
-
 		},
 	}
 
-	setValuesOptions(installCmd, commandLineOptions)
-	installCmd.PersistentFlags().StringVar(&commandLineOptions.Version, "version", "", "specify the exact chart version to use. If this is not specified, the latest version is used")
+	upgradeCmd.PersistentFlags().StringVar(&commandLineOptions.Version, "version", "", "specify the exact chart version to use. If this is not specified, the latest version is used")
+	setValuesOptions(upgradeCmd, commandLineOptions)
 
-	return installCmd
+	return upgradeCmd
 }

@@ -2,10 +2,14 @@ package action
 
 import (
 	"fmt"
-	"strings"
+	"sort"
 	"text/tabwriter"
 
 	"github.com/redhat-cop/oc-helm/pkg/client"
+	"github.com/redhat-cop/oc-helm/pkg/types"
+	"github.com/redhat-cop/oc-helm/pkg/utils"
+
+	"helm.sh/helm/v3/pkg/repo"
 
 	"github.com/redhat-cop/oc-helm/pkg/options"
 )
@@ -51,18 +55,18 @@ func (i *IndexAction) Run() error {
 
 		index.SortEntries()
 
+		charVersionRepositories := sortIndexEntries(index.Entries)
+
 		w := tabwriter.NewWriter(i.commandLineOptions.Streams.Out, 0, 8, 1, '\t', tabwriter.AlignRight)
 
 		fmt.Fprintln(w, "REPOSITORY\tNAME\tLATEST VERSION")
 
-		for chartName, charts := range index.Entries {
+		for _, chartVersionRepository := range charVersionRepositories {
 
-			chartNameItems := strings.Split(chartName, "--")
+			fmt.Fprintf(w, "%s\t%s\t", chartVersionRepository.Repository, chartVersionRepository.Chart)
 
-			fmt.Fprintf(w, "%s\t%s\t", chartNameItems[1], chartNameItems[0])
-
-			if len(charts) > 0 {
-				fmt.Fprint(w, charts[0].Version)
+			if len(chartVersionRepository.ChartVersions) > 0 {
+				fmt.Fprint(w, chartVersionRepository.ChartVersions[0].Version)
 			}
 
 			fmt.Fprint(w, "\n")
@@ -77,4 +81,51 @@ func (i *IndexAction) Run() error {
 
 	return nil
 
+}
+
+func sortIndexEntries(entries map[string]repo.ChartVersions) []types.ChartVersionRepository {
+
+	uniqueRepositories := map[string][]string{}
+	repositories := []string{}
+	chartVersions := []types.ChartVersionRepository{}
+
+	for key, _ := range entries {
+		repository, chart, err := utils.SplitRepositoryIndexKey(key)
+		if err == nil {
+			charts := uniqueRepositories[repository]
+
+			if charts == nil {
+				repositories = append(repositories, repository)
+				charts = []string{chart}
+			} else {
+				charts = append(charts, chart)
+			}
+
+			uniqueRepositories[repository] = charts
+
+		}
+	}
+
+	sort.Strings(repositories)
+
+	for _, repositoryKey := range repositories {
+
+		repositoryCharts := uniqueRepositories[repositoryKey]
+
+		sort.Strings(repositoryCharts)
+
+		for _, repositoryChart := range repositoryCharts {
+
+			if repositoryChartVersions, ok := entries[utils.CreateRepositoryIndexKey(repositoryKey, repositoryChart)]; ok {
+				chartVersions = append(chartVersions, types.ChartVersionRepository{
+					Chart:         repositoryChart,
+					Repository:    repositoryKey,
+					ChartVersions: repositoryChartVersions,
+				})
+			}
+
+		}
+	}
+
+	return chartVersions
 }

@@ -32,9 +32,6 @@ func newRootCmd(commandLineOptions *options.CommandLineOption) (*cobra.Command, 
 		Long:          "OpenShift Command Line tool to interact with Helm capabilities.",
 		SilenceUsage:  true,
 		SilenceErrors: true,
-		// Uncomment the following line if your bare application
-		// has an action associated with it:
-		// Run: func(cmd *cobra.Command, args []string) { },
 	}
 
 	rootCmd.PersistentFlags().StringVar(&commandLineOptions.ConsoleHostname, "console-hostname", "", "OpenShift Console Hostname")
@@ -49,6 +46,7 @@ func newRootCmd(commandLineOptions *options.CommandLineOption) (*cobra.Command, 
 		newListCmd(commandLineOptions),
 		newRollbackCmd(commandLineOptions),
 		newUninstallCmd(commandLineOptions),
+		newUpgradeCmd(commandLineOptions),
 	)
 
 	return rootCmd, nil
@@ -65,4 +63,12 @@ func Execute() {
 		fmt.Fprintln(commandLineOption.Streams.ErrOut, err)
 		os.Exit(1)
 	}
+}
+
+func setValuesOptions(cmd *cobra.Command, commandLineOption *options.CommandLineOption) {
+	cmd.Flags().StringSliceVarP(&commandLineOption.ValueFiles, "values", "f", []string{}, "specify values in a YAML file or a URL (can specify multiple)")
+	cmd.Flags().StringArrayVar(&commandLineOption.Values, "set", []string{}, "set values on the command line (can specify multiple or separate values with commas: key1=val1,key2=val2)")
+	cmd.Flags().StringArrayVar(&commandLineOption.StringValues, "set-string", []string{}, "set STRING values on the command line (can specify multiple or separate values with commas: key1=val1,key2=val2)")
+	cmd.Flags().StringArrayVar(&commandLineOption.FileValues, "set-file", []string{}, "set values from respective files specified via the command line (can specify multiple or separate values with commas: key1=path1,key2=path2)")
+
 }

@@ -6,6 +6,7 @@ import (
 	"time"
 
 	"github.com/redhat-cop/oc-helm/pkg/client"
+	"github.com/redhat-cop/oc-helm/pkg/utils"
 	"helm.sh/helm/v3/pkg/repo"
 
 	"github.com/redhat-cop/oc-helm/pkg/options"
@@ -48,12 +49,14 @@ func (i *InstallAction) Run(releaseName string, chartReference string) error {
 		return err
 	}
 
+	index.SortEntries()
+
 	chartReferenceParts := strings.Split(chartReference, "/")
 
 	repository := chartReferenceParts[0]
 	chartName := chartReferenceParts[1]
 
-	consoleChartName := fmt.Sprintf("%s--%s", chartName, repository)
+	consoleChartName := utils.CreateRepositoryIndexKey(repository, chartName)
 
 	charts := index.Entries[consoleChartName]
 
@@ -78,15 +81,14 @@ func (i *InstallAction) Run(releaseName string, chartReference string) error {
 	}
 
 	chartURL := chartVersion.URLs[0]
-	chart, err := i.helmChartClient.GetChart(chartURL)
+
+	values, err := utils.MergeValues(i.commandLineOptions)
 
 	if err != nil {
 		return err
 	}
 
-	// TODO: Manage Values
-
-	release, err := i.helmChartClient.CreateRelease(releaseName, chartURL, chart.Values)
+	release, err := i.helmChartClient.CreateRelease(releaseName, chartURL, values)
 
 	if err != nil {
 		return err

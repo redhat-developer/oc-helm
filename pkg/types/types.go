@@ -1,5 +1,9 @@
 package types
 
+import (
+	"helm.sh/helm/v3/pkg/repo"
+)
+
 type HelmClientError struct {
 	StatusCode      int
 	Message         string
@@ -17,4 +21,10 @@ type HelmRequest struct {
 	ChartUrl  string                 `json:"chart_url"`
 	Values    map[string]interface{} `json:"values"`
 	Version   int                    `json:"version"`
+}
+
+type ChartVersionRepository struct {
+	Repository    string
+	Chart         string
+	ChartVersions repo.ChartVersions
 }
