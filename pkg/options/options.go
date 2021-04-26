@@ -24,6 +24,7 @@ type CommandLineOption struct {
 	StringValues    []string
 	Values          []string
 	FileValues      []string
+	Install         bool
 }
 
 func NewCommandLineOption() *CommandLineOption {

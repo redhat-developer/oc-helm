@@ -60,6 +60,7 @@ func newUpgradeCmd(commandLineOptions *options.CommandLineOption) *cobra.Command
 	}
 
 	upgradeCmd.PersistentFlags().StringVar(&commandLineOptions.Version, "version", "", "specify the exact chart version to use. If this is not specified, the latest version is used")
+	upgradeCmd.PersistentFlags().BoolVarP(&commandLineOptions.Install, "install", "i", false, "if a release by this name doesn't already exist, run an install")
 	setValuesOptions(upgradeCmd, commandLineOptions)
 
 	return upgradeCmd

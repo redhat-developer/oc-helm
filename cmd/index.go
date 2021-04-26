@@ -40,7 +40,6 @@ func newIndexCmd(commandLineOptions *options.CommandLineOption) *cobra.Command {
 
 			return action.Run()
 
-			return nil
 		},
 	}
 

@@ -135,7 +135,7 @@ func (c *HelmChartClient) History(releaseName string) (*[]release.Release, error
 
 }
 
-func (c *HelmChartClient) CreateRelease(releaseName string, chartUrl string, values map[string]interface{}) (*release.Release, error) {
+func (c *HelmChartClient) CreateRelease(releaseName string, chartUrl string, values map[string]interface{}, upgrade bool) (*release.Release, error) {
 
 	helmRequest := &types.HelmRequest{
 		Name:      releaseName,
@@ -144,7 +144,14 @@ func (c *HelmChartClient) CreateRelease(releaseName string, chartUrl string, val
 		Values:    values,
 	}
 
-	req, err := c.newRequest("POST", "/api/helm/release", helmRequest)
+	var req *http.Request
+	var err error
+
+	if upgrade {
+		req, err = c.newRequest("PUT", "/api/helm/release", helmRequest)
+	} else {
+		req, err = c.newRequest("POST", "/api/helm/release", helmRequest)
+	}
 
 	if err != nil {
 		return nil, err
@@ -160,7 +167,7 @@ func (c *HelmChartClient) CreateRelease(releaseName string, chartUrl string, val
 			return nil, fmt.Errorf("%s", helmClientError.HelmServerError.Error)
 		}
 
-		return nil, fmt.Errorf("Failed to install release '%s': Status code: %d", releaseName, helmClientError.StatusCode)
+		return nil, fmt.Errorf("Failed to create release '%s': Status code: %d", releaseName, helmClientError.StatusCode)
 	}
 
 	return &release, nil

@@ -27,7 +27,7 @@ func newHistoryCmd(commandLineOptions *options.CommandLineOption) *cobra.Command
 
 	action := action.NewHistoryAction(commandLineOptions)
 
-	// listCmd represents the list command
+	// historyCmd represents the list command
 	historyCmd := &cobra.Command{
 		Use:     "history RELEASE_NAME",
 		Short:   "Fetch release history",
