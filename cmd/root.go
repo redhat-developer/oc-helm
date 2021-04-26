@@ -19,9 +19,9 @@ import (
 	"fmt"
 	"os"
 
-	"github.com/spf13/cobra"
-
+	"github.com/redhat-cop/oc-helm/pkg/constants"
 	"github.com/redhat-cop/oc-helm/pkg/options"
+	"github.com/spf13/cobra"
 )
 
 func newRootCmd(commandLineOptions *options.CommandLineOption) (*cobra.Command, error) {
@@ -34,10 +34,10 @@ func newRootCmd(commandLineOptions *options.CommandLineOption) (*cobra.Command, 
 		SilenceErrors: true,
 	}
 
-	rootCmd.PersistentFlags().StringVar(&commandLineOptions.ConsoleHostname, "console-hostname", "", "OpenShift Console Hostname")
+	rootCmd.PersistentFlags().StringVar(&commandLineOptions.ConsoleHostname, "console-hostname", os.Getenv(constants.OPENSHIFT_CONSOLE_HOSTNAME_ENV), "OpenShift Console Hostname")
 	rootCmd.PersistentFlags().StringVar(&commandLineOptions.Context, "context", "", "Kubernetes Context")
 	rootCmd.PersistentFlags().StringVarP(&commandLineOptions.Namespace, "namespace", "n", "", "Kubernetes namespace")
-	rootCmd.PersistentFlags().StringVarP(&commandLineOptions.Token, "token", "t", "", "OpenShift OAuth token")
+	rootCmd.PersistentFlags().StringVarP(&commandLineOptions.Token, "token", "t", os.Getenv(constants.OPENSHIFT_OAUTH_TOKEN_ENV), "OpenShift OAuth token")
 
 	rootCmd.AddCommand(
 		newHistoryCmd(commandLineOptions),
@@ -56,7 +56,6 @@ func newRootCmd(commandLineOptions *options.CommandLineOption) (*cobra.Command, 
 func Execute() {
 
 	commandLineOption := options.NewCommandLineOption()
-
 	rootCmd, _ := newRootCmd(commandLineOption)
 
 	if err := rootCmd.Execute(); err != nil {
