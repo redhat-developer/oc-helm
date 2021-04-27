@@ -8,7 +8,6 @@ import (
 	"encoding/json"
 	"fmt"
 	"io"
-	"io/ioutil"
 	"net/http"
 	"net/url"
 
@@ -17,7 +16,6 @@ import (
 	"helm.sh/helm/v3/pkg/chart"
 	"helm.sh/helm/v3/pkg/release"
 	"helm.sh/helm/v3/pkg/repo"
-	"sigs.k8s.io/yaml"
 )
 
 const (
@@ -120,7 +118,7 @@ func (c *HelmChartClient) History(releaseName string) (*[]release.Release, error
 
 	var releaseHistory []release.Release
 
-	_, helmClientError := c.do(req, &releaseHistory, true)
+	_, helmClientError := do(c.httpClient, req, &releaseHistory, true, true)
 
 	if helmClientError != nil {
 
@@ -159,7 +157,7 @@ func (c *HelmChartClient) CreateRelease(releaseName string, chartUrl string, val
 
 	var release release.Release
 
-	_, helmClientError := c.do(req, &release, true)
+	_, helmClientError := do(c.httpClient, req, &release, true, true)
 
 	if helmClientError != nil {
 
@@ -190,7 +188,7 @@ func (c *HelmChartClient) Rollback(releaseName string, revision int) (*release.R
 
 	var rollbackReleaseResponse release.Release
 
-	_, helmClientError := c.do(req, &rollbackReleaseResponse, true)
+	_, helmClientError := do(c.httpClient, req, &rollbackReleaseResponse, true, true)
 
 	if helmClientError != nil {
 
@@ -215,7 +213,7 @@ func (c *HelmChartClient) Uninstall(releaseName string) (*release.UninstallRelea
 
 	var uninstallReleaseResponse release.UninstallReleaseResponse
 
-	_, helmClientError := c.do(req, &uninstallReleaseResponse, true)
+	_, helmClientError := do(c.httpClient, req, &uninstallReleaseResponse, true, true)
 
 	if helmClientError != nil {
 
@@ -239,7 +237,7 @@ func (c *HelmChartClient) GetIndex() (*repo.IndexFile, error) {
 
 	var indexFile repo.IndexFile
 
-	_, helmClientError := c.do(req, &indexFile, false)
+	_, helmClientError := do(c.httpClient, req, &indexFile, false, true)
 
 	if helmClientError != nil {
 		return nil, helmClientError.Error
@@ -259,7 +257,7 @@ func (c *HelmChartClient) ListReleases() (*[]release.Release, error) {
 
 	var release []release.Release
 
-	_, helmClientError := c.do(req, &release, true)
+	_, helmClientError := do(c.httpClient, req, &release, true, true)
 
 	if helmClientError != nil {
 		return nil, helmClientError.Error
@@ -279,7 +277,7 @@ func (c *HelmChartClient) GetChart(url string) (*chart.Chart, error) {
 
 	var chart chart.Chart
 
-	_, helmClientError := c.do(req, &chart, true)
+	_, helmClientError := do(c.httpClient, req, &chart, true, true)
 
 	if helmClientError != nil {
 		return nil, helmClientError.Error
@@ -299,7 +297,7 @@ func (c *HelmChartClient) GetRelease(releaseName string) (*release.Release, erro
 
 	var release release.Release
 
-	_, helmClientError := c.do(req, &release, true)
+	_, helmClientError := do(c.httpClient, req, &release, true, true)
 
 	if helmClientError != nil {
 
@@ -312,67 +310,6 @@ func (c *HelmChartClient) GetRelease(releaseName string) (*release.Release, erro
 
 	return &release, nil
 
-}
-
-func (c *HelmChartClient) do(req *http.Request, v interface{}, jsonResponse bool) (*http.Response, *types.HelmClientError) {
-	resp, err := c.httpClient.Do(req)
-	if err != nil {
-		return nil, &types.HelmClientError{Error: err}
-	}
-
-	defer resp.Body.Close()
-
-	statusCode := resp.StatusCode
-
-	helmClientError := &types.HelmClientError{
-		StatusCode: statusCode,
-		Message:    http.StatusText(statusCode),
-	}
-
-	if v != nil {
-
-		if jsonResponse {
-
-			if statusCode > 399 {
-				var helmServerError types.HelmServerError
-				err = json.NewDecoder(resp.Body).Decode(&helmServerError)
-
-				if err == nil {
-					helmClientError.HelmServerError = &helmServerError
-				}
-
-				return nil, helmClientError
-
-			}
-
-			err = json.NewDecoder(resp.Body).Decode(v)
-			if err != nil {
-				return nil, &types.HelmClientError{Error: err, StatusCode: statusCode}
-			}
-
-		} else {
-
-			if resp.StatusCode > 399 {
-
-				return nil, &types.HelmClientError{StatusCode: statusCode, Message: http.StatusText(statusCode), Error: fmt.Errorf("%s", http.StatusText(resp.StatusCode))}
-			}
-
-			bodyBytes, err := ioutil.ReadAll(resp.Body)
-
-			if err != nil {
-				return nil, &types.HelmClientError{Error: err, StatusCode: statusCode}
-			}
-
-			err = yaml.Unmarshal(bodyBytes, v)
-
-			if err != nil {
-				return resp, &types.HelmClientError{Error: err, StatusCode: statusCode}
-			}
-
-		}
-	}
-
-	return resp, nil
 }
 
 func (c *HelmChartClient) createPath(contextPath string) string {

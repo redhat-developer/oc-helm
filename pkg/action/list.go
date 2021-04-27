@@ -5,38 +5,19 @@ import (
 	"text/tabwriter"
 	"time"
 
-	"github.com/redhat-cop/oc-helm/pkg/client"
-
 	"github.com/redhat-cop/oc-helm/pkg/options"
 )
 
 type ListAction struct {
-	commandLineOptions *options.CommandLineOption
-	helmChartClient    *client.HelmChartClient
+	baseAction
 }
 
-func NewListAction(commandLineOptions *options.CommandLineOption) Action {
+func NewListAction(commandLineOptions *options.CommandLineOption) *ListAction {
 	return &ListAction{
-		commandLineOptions: commandLineOptions,
+		baseAction: baseAction{
+			commandLineOptions: commandLineOptions,
+		},
 	}
-}
-
-func (l *ListAction) BuildHelmChartClient() error {
-
-	if err := l.commandLineOptions.Process(); err != nil {
-		return err
-	}
-
-	helmChartClient, err := client.NewHelmChartClient(l.commandLineOptions)
-
-	if err != nil {
-		return err
-	}
-
-	l.helmChartClient = helmChartClient
-
-	return nil
-
 }
 
 func (l *ListAction) Run() error {

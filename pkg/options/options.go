@@ -2,9 +2,7 @@ package options
 
 import (
 	"fmt"
-	"net/url"
 	"os"
-	"strings"
 
 	"k8s.io/cli-runtime/pkg/genericclioptions"
 )
@@ -16,6 +14,7 @@ type CommandLineOption struct {
 	Token           string
 	Insecure        bool
 	Namespace       string
+	Server          string
 	ChartName       string
 	ChartRepository string
 	Context         string
@@ -68,17 +67,8 @@ func (c *CommandLineOption) Process() error {
 		c.Namespace = currentContext.Namespace
 	}
 
-	if c.ConsoleHostname == "" {
-		server := rawConfig.Clusters[currentContext.Cluster].Server
-
-		serverURL, err := url.Parse(server)
-
-		if err != nil {
-			return err
-		}
-
-		c.ConsoleHostname = strings.Replace(serverURL.Hostname(), "api", "console-openshift-console.apps", 1)
-
+	if c.Server == "" {
+		c.Server = rawConfig.Clusters[currentContext.Cluster].Server
 	}
 
 	return nil

@@ -5,7 +5,6 @@ import (
 	"sort"
 	"text/tabwriter"
 
-	"github.com/redhat-cop/oc-helm/pkg/client"
 	"github.com/redhat-cop/oc-helm/pkg/types"
 	"github.com/redhat-cop/oc-helm/pkg/utils"
 
@@ -15,32 +14,15 @@ import (
 )
 
 type IndexAction struct {
-	commandLineOptions *options.CommandLineOption
-	helmChartClient    *client.HelmChartClient
+	baseAction
 }
 
-func NewIndexAction(commandLineOptions *options.CommandLineOption) Action {
+func NewIndexAction(commandLineOptions *options.CommandLineOption) *IndexAction {
 	return &IndexAction{
-		commandLineOptions: commandLineOptions,
+		baseAction: baseAction{
+			commandLineOptions: commandLineOptions,
+		},
 	}
-}
-
-func (i *IndexAction) BuildHelmChartClient() error {
-
-	if err := i.commandLineOptions.Process(); err != nil {
-		return err
-	}
-
-	helmChartClient, err := client.NewHelmChartClient(i.commandLineOptions)
-
-	if err != nil {
-		return err
-	}
-
-	i.helmChartClient = helmChartClient
-
-	return nil
-
 }
 
 func (i *IndexAction) Run() error {

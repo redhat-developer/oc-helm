@@ -3,38 +3,19 @@ package action
 import (
 	"fmt"
 
-	"github.com/redhat-cop/oc-helm/pkg/client"
-
 	"github.com/redhat-cop/oc-helm/pkg/options"
 )
 
 type UninstallAction struct {
-	commandLineOptions *options.CommandLineOption
-	helmChartClient    *client.HelmChartClient
+	baseAction
 }
 
 func NewUninstallAction(commandLineOptions *options.CommandLineOption) *UninstallAction {
 	return &UninstallAction{
-		commandLineOptions: commandLineOptions,
+		baseAction: baseAction{
+			commandLineOptions: commandLineOptions,
+		},
 	}
-}
-
-func (h *UninstallAction) BuildHelmChartClient() error {
-
-	if err := h.commandLineOptions.Process(); err != nil {
-		return err
-	}
-
-	helmChartClient, err := client.NewHelmChartClient(h.commandLineOptions)
-
-	if err != nil {
-		return err
-	}
-
-	h.helmChartClient = helmChartClient
-
-	return nil
-
 }
 
 func (u *UninstallAction) Run(releaseName string) error {

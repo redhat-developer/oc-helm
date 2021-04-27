@@ -49,7 +49,7 @@ func newUpgradeCmd(commandLineOptions *options.CommandLineOption) *cobra.Command
 		},
 		RunE: func(cmd *cobra.Command, args []string) error {
 
-			err := action.BuildHelmChartClient()
+			err := action.Setup()
 
 			if err != nil {
 				return err

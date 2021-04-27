@@ -32,7 +32,7 @@ func newIndexCmd(commandLineOptions *options.CommandLineOption) *cobra.Command {
 		Long:  "Index of Available Charts Defined in the Cluster",
 		RunE: func(cmd *cobra.Command, args []string) error {
 
-			err := action.BuildHelmChartClient()
+			err := action.Setup()
 
 			if err != nil {
 				return err

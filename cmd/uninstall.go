@@ -42,7 +42,7 @@ func newUninstallCmd(commandLineOptions *options.CommandLineOption) *cobra.Comma
 		},
 		RunE: func(cmd *cobra.Command, args []string) error {
 
-			err := action.BuildHelmChartClient()
+			err := action.Setup()
 
 			if err != nil {
 				return err

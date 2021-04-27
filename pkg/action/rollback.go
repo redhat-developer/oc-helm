@@ -3,39 +3,20 @@ package action
 import (
 	"fmt"
 
-	"github.com/redhat-cop/oc-helm/pkg/client"
-
 	"github.com/redhat-cop/oc-helm/pkg/options"
 )
 
 type RollbackAction struct {
-	commandLineOptions *options.CommandLineOption
-	helmChartClient    *client.HelmChartClient
-	revision           int
+	baseAction
+	revision int
 }
 
 func NewRollbackAction(commandLineOptions *options.CommandLineOption) *RollbackAction {
 	return &RollbackAction{
-		commandLineOptions: commandLineOptions,
+		baseAction: baseAction{
+			commandLineOptions: commandLineOptions,
+		},
 	}
-}
-
-func (r *RollbackAction) BuildHelmChartClient() error {
-
-	if err := r.commandLineOptions.Process(); err != nil {
-		return err
-	}
-
-	helmChartClient, err := client.NewHelmChartClient(r.commandLineOptions)
-
-	if err != nil {
-		return err
-	}
-
-	r.helmChartClient = helmChartClient
-
-	return nil
-
 }
 
 func (r *RollbackAction) SetRevision(revision int) {

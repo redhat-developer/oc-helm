@@ -53,7 +53,7 @@ func newRollbackCmd(commandLineOptions *options.CommandLineOption) *cobra.Comman
 
 			}
 
-			err := action.BuildHelmChartClient()
+			err := action.Setup()
 
 			if err != nil {
 				return err

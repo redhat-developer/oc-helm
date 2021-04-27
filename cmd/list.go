@@ -33,7 +33,7 @@ func newListCmd(commandLineOptions *options.CommandLineOption) *cobra.Command {
 		Long:    `List installed charts`,
 		RunE: func(cmd *cobra.Command, args []string) error {
 
-			err := action.BuildHelmChartClient()
+			err := action.Setup()
 
 			if err != nil {
 				return err
