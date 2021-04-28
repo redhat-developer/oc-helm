@@ -14,7 +14,7 @@ type CommandLineOption struct {
 	Token           string
 	Insecure        bool
 	Namespace       string
-	Server          string
+	APIServer       string
 	ChartName       string
 	ChartRepository string
 	Context         string
@@ -67,8 +67,8 @@ func (c *CommandLineOption) Process() error {
 		c.Namespace = currentContext.Namespace
 	}
 
-	if c.Server == "" {
-		c.Server = rawConfig.Clusters[currentContext.Cluster].Server
+	if c.APIServer == "" {
+		c.APIServer = rawConfig.Clusters[currentContext.Cluster].Server
 	}
 
 	return nil

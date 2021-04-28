@@ -34,6 +34,7 @@ func newRootCmd(commandLineOptions *options.CommandLineOption) (*cobra.Command, 
 		SilenceErrors: true,
 	}
 
+	rootCmd.PersistentFlags().StringVar(&commandLineOptions.APIServer, "apiserver", os.Getenv(constants.OPENSHIFT_APISERVER), "OpenShift API Server Hostname")
 	rootCmd.PersistentFlags().StringVar(&commandLineOptions.ConsoleHostname, "console-hostname", os.Getenv(constants.OPENSHIFT_CONSOLE_HOSTNAME_ENV), "OpenShift Console Hostname")
 	rootCmd.PersistentFlags().StringVar(&commandLineOptions.Context, "context", "", "Kubernetes Context")
 	rootCmd.PersistentFlags().StringVarP(&commandLineOptions.Namespace, "namespace", "n", "", "Kubernetes namespace")
@@ -47,6 +48,7 @@ func newRootCmd(commandLineOptions *options.CommandLineOption) (*cobra.Command, 
 		newRollbackCmd(commandLineOptions),
 		newUninstallCmd(commandLineOptions),
 		newUpgradeCmd(commandLineOptions),
+		newVersionCmd(commandLineOptions),
 	)
 
 	return rootCmd, nil

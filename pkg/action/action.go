@@ -46,7 +46,7 @@ func (b *baseAction) Setup() error {
 			b.commandLineOptions.ConsoleHostname = consoleURL.Hostname()
 		} else {
 
-			serverURL, err := url.Parse(b.commandLineOptions.Server)
+			serverURL, err := url.Parse(b.commandLineOptions.APIServer)
 
 			if err != nil {
 				return err
