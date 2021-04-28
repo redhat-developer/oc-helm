@@ -33,7 +33,7 @@ func NewOpenShiftClient(commonOptions *options.CommandLineOption) (*OpenShiftCli
 
 	return &OpenShiftClient{
 		headers:    headers,
-		server:     commonOptions.Server,
+		server:     commonOptions.APIServer,
 		httpClient: httpClient,
 	}, nil
 }

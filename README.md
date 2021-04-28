@@ -31,37 +31,9 @@ The following prerequisites must be met prior to using the plugin:
 
 Perform the following steps to setup and configure the plugin on your machine:
 
-1. Clone the repository and navigate to the project directory:
+1. Download the latest release for your operating system from the [Release Page](https://github.com/sabre1041/oc-helm/releases)
 
-```shell
-git clone https://github.com/sabre1041/oc-helm
-cd oc-helm
-```
-
-2. Build the plugin
-
-```shell
-go build -o oc-helm main.go
-```
-
-3. Copy the resulting binary to a location on your `PATH`
-
-```shell
-mv oc-helm <DIRECTORY_ON_PATH>
-```
-
-4. Confirm the installation of the plugin
-
-```shell
-oc helm
-
-OpenShift Command Line tool to interact with Helm capabilities.
-
-Usage:
-  oc-helm [command]
-...
-
-```
+2. Extract the compressed archive and move the resulting binary to your path
 
 ## Walkthrough
 
@@ -145,4 +117,40 @@ Finally, uninstall the chart
 oc helm uninstall quarkus
 
 release "quarkus" uninstalled
+```
+
+## Development
+
+1. Clone the repository and navigate to the project directory:
+
+```shell
+git clone https://github.com/sabre1041/oc-helm
+cd oc-helm
+```
+
+2. Build the plugin
+
+```shell
+make build
+```
+
+The binary will be placed in the `bin` folder
+
+3. Install the binary to your path
+
+```shell
+make install
+```
+
+4. Confirm the installation of the plugin
+
+```shell
+oc helm
+
+OpenShift Command Line tool to interact with Helm capabilities.
+
+Usage:
+  oc-helm [command]
+...
+
 ```
