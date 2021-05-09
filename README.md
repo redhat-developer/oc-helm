@@ -12,6 +12,7 @@ The following capabilities are provides by this plugin
 
 * Discovering Helm Charts and Repositories registered on the platform
 * Chart lifecycle
+  * Show
   * Install
   * Upgrade
   * Rollback
