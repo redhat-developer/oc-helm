@@ -17,11 +17,13 @@ type CommandLineOption struct {
 	APIServer       string
 	ChartName       string
 	ChartRepository string
+	ChartUrl        string
 	Context         string
 	Version         string
 	ValueFiles      []string
 	StringValues    []string
 	Values          []string
+	VerifierOptions []string
 	FileValues      []string
 	Install         bool
 }
