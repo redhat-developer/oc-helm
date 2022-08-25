@@ -33,6 +33,13 @@ GO_LDFLAGS += -X $(VERSION_PACKAGE).buildDate=$(BUILD_DATE)
 GO_LDFLAGS += -X $(VERSION_PACKAGE).gitCommit=$(COMMIT)
 GO_LDFLAGS +="
 
+# Get the currently used golang install path (in GOPATH/bin, unless GOBIN is set)
+ifeq (,$(shell go env GOBIN))
+GOBIN=$(shell go env GOPATH)/bin
+else
+GOBIN=$(shell go env GOBIN)
+endif
+
 GO_FILES  := $(shell find . -type f -name '*.go')
 
 .PHONY: all
@@ -46,26 +53,29 @@ build:
 
 build-cross: LDFLAGS += -extldflags "-static"
 build-cross: $(GO_FILES) $(BUILDDIR) gox
-	GOFLAGS="-trimpath" gox -osarch="$(PLATFORMS)" -tags netgo -ldflags $(GO_LDFLAGS) -parallel=3 -output="_dist/{{.OS}}-{{.Arch}}/$(BINNAME)"
+	GOFLAGS="-trimpath" $(GOX) -osarch="$(PLATFORMS)" -tags netgo -ldflags $(GO_LDFLAGS) -parallel=3 -output="_dist/{{.OS}}-{{.Arch}}/$(BINNAME)"
 
 .PHONY: install
 install: build
 	@install "$(BINDIR)/$(BINNAME)" "$(INSTALL_PATH)/$(BINNAME)"
 
+GOX = $(shell pwd)/bin/gox
 gox:
-ifeq (, $(shell which gox))
-	@{ \
-	set -e ;\
-	GOX_TMP_DIR=$$(mktemp -d) ;\
-	cd $$GOX_TMP_DIR ;\
-	go mod init tmp ;\
-	go get github.com/mitchellh/gox ;\
-	rm -rf $$GOX_TMP_DIR ;\
-	}
-GOX=$(GOBIN)/controller-gen
-else
-GOX=$(shell which gox)
-endif
+	$(call go-get-tool,$(GOX),github.com/mitchellh/gox@v1.0.1)
+
+#go-get-tool will 'go get' any package $2 and install it to $1.
+PROJECT_DIR := $(shell dirname $(abspath $(lastword $(MAKEFILE_LIST))))
+define go-get-tool
+@[ -f $(1) ] || { \
+set -x ;\
+TMP_DIR=$$(mktemp -d) ;\
+cd $$TMP_DIR ;\
+go mod init tmp ;\
+echo "Downloading $(2)" ;\
+GOBIN=$(PROJECT_DIR)/bin go install $(2) ;\
+rm -rf $$TMP_DIR ;\
+}
+endef
 
 .PHONY: clean
 clean:
