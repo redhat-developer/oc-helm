@@ -28,3 +28,18 @@ type ChartVersionRepository struct {
 	Chart         string
 	ChartVersions repo.ChartVersions
 }
+
+type HelmVerifierRequest struct {
+	ChartUrl string                 `json:"chart_url"`
+	Values   map[string]interface{} `json:"values"`
+}
+
+type ResultsReport struct {
+	Passed   string   `json:"passed" yaml:"passed"`
+	Failed   string   `json:"failed" yaml:"failed"`
+	Messages []string `json:"message" yaml:"message"`
+}
+
+type ApiResult struct {
+	VerifierApiResult ResultsReport `json:"results"`
+}

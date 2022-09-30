@@ -19,6 +19,7 @@ The following capabilities are provides by this plugin
   * History
   * List
   * Uninstall
+  * Verify
 
 ## Prerequisites
 
@@ -118,6 +119,26 @@ Finally, uninstall the chart
 oc helm uninstall quarkus
 
 release "quarkus" uninstalled
+```
+
+You can also veify a chart. This allows users to validate a Helm chart URL and provides a report summary with the number of checks passed or failed.
+You need to specify the profile which chart verifier will use to run the test. If no profile is provided default is used. With respect to console we recommend using `developer-console` profile. The following checks are enabled in `developer-console` profile:
+
+| Checks | Description |
+|---|---|
+| IsHelmV3 | Checks that the given `uri` points to a Helm v3 chart. |
+| HasReadme | Checks that the Helm chart contains the `README.md` file. |
+| HasKubeVersion | Checks that the `Chart.yaml` file of the Helm chart includes the `kubeVersion` field (v1.0) and is a valid semantic version (v1.1). |
+| ContainsValuesSchema | Checks that the Helm chart contains a JSON schema file (`values.schema.json`) to validate the `values.yaml` file in the chart. |
+|  HelmLint | Checks that the chart is well formed by running the `helm lint` command. |
+| ContainsValues | Checks that the Helm chart contains the `values`[¹](https://github.com/redhat-certification/chart-verifier/blob/main/docs/helm-chart-checks.md#-for-more-information-on-the-values-file-see-values-and-best-practices-for-using-values) file. |
+
+example:
+
+```shell
+oc helm verify --chart-url https://github.com/openshift-helm-charts/charts/releases/download/redhat-mysql-sed-0.1.0/redhat-mysql-sed-0.1.0.tgz  --values provider=developer-console
+NUMBER OF CHECKS PASSED: 6
+NUMBER OF CHECKS FAILED: 0
 ```
 
 ## Development

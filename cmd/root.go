@@ -50,6 +50,7 @@ func newRootCmd(commandLineOptions *options.CommandLineOption) (*cobra.Command, 
 		newUpgradeCmd(commandLineOptions),
 		newVersionCmd(commandLineOptions),
 		newShowCmd(commandLineOptions),
+		newVerifyCmd(commandLineOptions),
 	)
 
 	return rootCmd, nil

@@ -28,7 +28,6 @@ func NewIndexAction(commandLineOptions *options.CommandLineOption) *IndexAction 
 func (i *IndexAction) Run() error {
 
 	index, err := i.helmChartClient.GetIndex()
-
 	if err != nil {
 		return err
 	}
@@ -41,14 +40,13 @@ func (i *IndexAction) Run() error {
 
 		w := tabwriter.NewWriter(i.commandLineOptions.Streams.Out, 0, 8, 1, '\t', tabwriter.AlignRight)
 
-		fmt.Fprintln(w, "REPOSITORY\tNAME\tLATEST VERSION")
+		fmt.Fprintln(w, "REPOSITORY\tNAME\tLATEST VERSION\tCHART URLS")
 
 		for _, chartVersionRepository := range charVersionRepositories {
-
 			fmt.Fprintf(w, "%s\t%s\t", chartVersionRepository.Repository, chartVersionRepository.Chart)
 
 			if len(chartVersionRepository.ChartVersions) > 0 {
-				fmt.Fprint(w, chartVersionRepository.ChartVersions[0].Version)
+				fmt.Fprintf(w, "%s\t%s", chartVersionRepository.ChartVersions[0].Version, chartVersionRepository.ChartVersions[0].URLs)
 			}
 
 			fmt.Fprint(w, "\n")
@@ -97,7 +95,6 @@ func sortIndexEntries(entries map[string]repo.ChartVersions) []types.ChartVersio
 		sort.Strings(repositoryCharts)
 
 		for _, repositoryChart := range repositoryCharts {
-
 			if repositoryChartVersions, ok := entries[utils.CreateRepositoryIndexKey(repositoryKey, repositoryChart)]; ok {
 				chartVersions = append(chartVersions, types.ChartVersionRepository{
 					Chart:         repositoryChart,

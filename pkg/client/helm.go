@@ -229,7 +229,7 @@ func (c *HelmChartClient) Uninstall(releaseName string) (*release.UninstallRelea
 }
 
 func (c *HelmChartClient) GetIndex() (*repo.IndexFile, error) {
-	req, err := c.newRequest("GET", "/api/helm/charts/index.yaml", nil)
+	req, err := c.newRequest("GET", fmt.Sprintf("/api/helm/charts/index.yaml?namespace=%s", c.namespace), nil)
 
 	if err != nil {
 		return nil, err
@@ -238,7 +238,6 @@ func (c *HelmChartClient) GetIndex() (*repo.IndexFile, error) {
 	var indexFile repo.IndexFile
 
 	_, helmClientError := do(c.httpClient, req, &indexFile, false, true)
-
 	if helmClientError != nil {
 		return nil, helmClientError.Error
 	}
@@ -314,6 +313,34 @@ func (c *HelmChartClient) GetRelease(releaseName string) (*release.Release, erro
 
 func (c *HelmChartClient) createPath(contextPath string) string {
 	return fmt.Sprintf("%s%s", c.consoleURL, contextPath)
+}
+
+func (c *HelmChartClient) VerifyChart(chartUrl string, values map[string]interface{}) (*types.ApiResult, error) {
+
+	helmRequest := &types.HelmVerifierRequest{
+		ChartUrl: chartUrl,
+		Values:   values,
+	}
+	var req *http.Request
+	var err error
+	req, err = c.newRequest(http.MethodPost, "/api/helm/verify", helmRequest)
+	if err != nil {
+		return nil, err
+	}
+
+	var result types.ApiResult
+
+	_, helmClientError := do(c.httpClient, req, &result, true, true)
+	if helmClientError != nil {
+
+		if helmClientError.HelmServerError != nil {
+			return nil, fmt.Errorf("%s", helmClientError.HelmServerError.Error)
+		}
+		return nil, fmt.Errorf("Failed to verify chart '%s': Status code: %d", chartUrl, helmClientError.StatusCode)
+	}
+
+	return &result, nil
+
 }
 
 func randomString(length int) string {
