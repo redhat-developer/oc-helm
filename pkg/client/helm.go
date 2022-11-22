@@ -133,7 +133,7 @@ func (c *HelmChartClient) History(releaseName string) (*[]release.Release, error
 
 }
 
-func (c *HelmChartClient) CreateRelease(releaseName string, chartUrl string, values map[string]interface{}, upgrade bool) (*release.Release, error) {
+func (c *HelmChartClient) CreateRelease(releaseName string, chartUrl string, values map[string]interface{}, upgrade bool) (*types.ReleaseSecret, error) {
 
 	helmRequest := &types.HelmRequest{
 		Name:      releaseName,
@@ -155,9 +155,9 @@ func (c *HelmChartClient) CreateRelease(releaseName string, chartUrl string, val
 		return nil, err
 	}
 
-	var release release.Release
+	var releaseSecret types.ReleaseSecret
 
-	_, helmClientError := do(c.httpClient, req, &release, true, true)
+	_, helmClientError := do(c.httpClient, req, &releaseSecret, true, true)
 
 	if helmClientError != nil {
 
@@ -168,7 +168,7 @@ func (c *HelmChartClient) CreateRelease(releaseName string, chartUrl string, val
 		return nil, fmt.Errorf("Failed to create release '%s': Status code: %d", releaseName, helmClientError.StatusCode)
 	}
 
-	return &release, nil
+	return &releaseSecret, nil
 
 }
 
