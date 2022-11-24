@@ -133,7 +133,7 @@ func (c *HelmChartClient) History(releaseName string) (*[]release.Release, error
 
 }
 
-func (c *HelmChartClient) CreateRelease(releaseName string, chartUrl string, values map[string]interface{}, upgrade bool) (*types.ReleaseSecret, error) {
+func (c *HelmChartClient) CreateRelease(releaseName string, chartUrl string, values map[string]interface{}, upgrade bool) (*release.Release, error) {
 
 	helmRequest := &types.HelmRequest{
 		Name:      releaseName,
@@ -155,9 +155,9 @@ func (c *HelmChartClient) CreateRelease(releaseName string, chartUrl string, val
 		return nil, err
 	}
 
-	var releaseSecret types.ReleaseSecret
+	var release release.Release
 
-	_, helmClientError := do(c.httpClient, req, &releaseSecret, true, true)
+	_, helmClientError := do(c.httpClient, req, &release, true, true)
 
 	if helmClientError != nil {
 
@@ -168,7 +168,46 @@ func (c *HelmChartClient) CreateRelease(releaseName string, chartUrl string, val
 		return nil, fmt.Errorf("Failed to create release '%s': Status code: %d", releaseName, helmClientError.StatusCode)
 	}
 
-	return &releaseSecret, nil
+	return &release, nil
+
+}
+
+func (c *HelmChartClient) CreateReleaseAsync(releaseName string, chartUrl string, values map[string]interface{}, upgrade bool) (*types.ReleaseSecret, error) {
+
+	helmRequest := &types.HelmRequest{
+		Name:      releaseName,
+		Namespace: c.namespace,
+		ChartUrl:  chartUrl,
+		Values:    values,
+	}
+
+	var req *http.Request
+	var err error
+
+	if upgrade {
+		req, err = c.newRequest("PUT", "/api/helm/release/async", helmRequest)
+	} else {
+		req, err = c.newRequest("POST", "/api/helm/release/async", helmRequest)
+	}
+
+	if err != nil {
+		return nil, err
+	}
+
+	var release types.ReleaseSecret
+
+	_, helmClientError := do(c.httpClient, req, &release, true, true)
+
+	if helmClientError != nil {
+
+		if helmClientError.HelmServerError != nil {
+			return nil, fmt.Errorf("%s", helmClientError.HelmServerError.Error)
+		}
+
+		return nil, fmt.Errorf("Failed to create release '%s': Status code: %d", releaseName, helmClientError.StatusCode)
+	}
+
+	return &release, nil
 
 }
 
