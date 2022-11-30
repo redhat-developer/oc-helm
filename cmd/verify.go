@@ -1,3 +1,4 @@
+// Copyright © 2022 redhat-developer
 package cmd
 
 import (

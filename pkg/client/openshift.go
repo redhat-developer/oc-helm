@@ -27,6 +27,7 @@ func NewOpenShiftClient(commonOptions *options.CommandLineOption) (*OpenShiftCli
 
 	httpClient := &http.Client{
 		Transport: &http.Transport{
+			// #nosec G402
 			TLSClientConfig: &tls.Config{InsecureSkipVerify: true},
 		},
 	}

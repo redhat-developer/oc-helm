@@ -1,5 +1,5 @@
 /*
-Copyright © 2021 Andrew Block <andy.block@gmail.com>
+Copyright © 2022  redhat-developer
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.

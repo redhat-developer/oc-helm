@@ -82,7 +82,7 @@ func readFile(filePath string) ([]byte, error) {
 	if strings.TrimSpace(filePath) == "-" {
 		return ioutil.ReadAll(os.Stdin)
 	}
-
+	// #nosec G304
 	return ioutil.ReadFile(filePath)
 
 }
