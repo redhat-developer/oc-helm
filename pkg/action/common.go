@@ -168,5 +168,5 @@ func installChartAsync(helmChartInstall *HelmChartInstall) error {
 }
 
 func printReleaseDeploymentStatusAsync(w io.Writer, release *types.ReleaseSecret) {
-	fmt.Fprintf(w, "NAME: %s\n", release.Name)
+	fmt.Fprintf(w, "NAME: %s\n", release.SecretName)
 }

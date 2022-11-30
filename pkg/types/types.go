@@ -45,5 +45,5 @@ type ApiResult struct {
 }
 
 type ReleaseSecret struct {
-	Name string `json:"name"`
+	SecretName string `json:"secret_name"`
 }
