@@ -172,6 +172,45 @@ func (c *HelmChartClient) CreateRelease(releaseName string, chartUrl string, val
 
 }
 
+func (c *HelmChartClient) CreateReleaseAsync(releaseName string, chartUrl string, values map[string]interface{}, upgrade bool) (*types.ReleaseSecret, error) {
+
+	helmRequest := &types.HelmRequest{
+		Name:      releaseName,
+		Namespace: c.namespace,
+		ChartUrl:  chartUrl,
+		Values:    values,
+	}
+
+	var req *http.Request
+	var err error
+
+	if upgrade {
+		req, err = c.newRequest("PUT", "/api/helm/release/async", helmRequest)
+	} else {
+		req, err = c.newRequest("POST", "/api/helm/release/async", helmRequest)
+	}
+
+	if err != nil {
+		return nil, err
+	}
+
+	var release types.ReleaseSecret
+
+	_, helmClientError := do(c.httpClient, req, &release, true, true)
+
+	if helmClientError != nil {
+
+		if helmClientError.HelmServerError != nil {
+			return nil, fmt.Errorf("%s", helmClientError.HelmServerError.Error)
+		}
+
+		return nil, fmt.Errorf("Failed to create release '%s': Status code: %d", releaseName, helmClientError.StatusCode)
+	}
+
+	return &release, nil
+
+}
+
 func (c *HelmChartClient) Rollback(releaseName string, revision int) (*release.Release, error) {
 
 	helmRequest := &types.HelmRequest{

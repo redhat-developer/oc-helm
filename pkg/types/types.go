@@ -43,3 +43,7 @@ type ResultsReport struct {
 type ApiResult struct {
 	VerifierApiResult ResultsReport `json:"results"`
 }
+
+type ReleaseSecret struct {
+	SecretName string `json:"secret_name"`
+}
