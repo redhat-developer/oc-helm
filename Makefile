@@ -90,3 +90,10 @@ dist:
 		$(TAR_DIST_DIRS) tar -zcf oc-helm-${VERSION}-{}.tar.gz {} \; && \
 		$(ZIP_DIST_DIRS) zip -r oc-helm-${VERSION}-{}.zip {} \; \
 	)
+
+.PHONY: gosec
+gosec:
+	# Run this command to install gosec, if not installed:
+	# export PATH=$PATH:$(go env GOPATH)/bin
+	# go install github.com/securego/gosec/v2/cmd/gosec@latest
+	gosec -no-fail -fmt=sarif -out=gosec.sarif -exclude-dir tests ./...

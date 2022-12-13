@@ -19,6 +19,7 @@ import (
 )
 
 const (
+	// #nosec G101
 	OPENSHIFT_SESSION_TOKEN_NAME = "openshift-session-token"
 	CSRF_TOKEN_NAME              = "csrf-token"
 	CSRF_HEADER                  = "X-CSRFToken"
@@ -63,6 +64,7 @@ func NewHelmChartClient(commonOptions *options.CommandLineOption) (*HelmChartCli
 
 	httpClient := &http.Client{
 		Transport: &http.Transport{
+			// #nosec G402
 			TLSClientConfig: &tls.Config{InsecureSkipVerify: true},
 		},
 	}
