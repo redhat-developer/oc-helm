@@ -26,6 +26,7 @@ type CommandLineOption struct {
 	VerifierOptions []string
 	FileValues      []string
 	Install         bool
+	LimitInfo       bool
 }
 
 func NewCommandLineOption() *CommandLineOption {

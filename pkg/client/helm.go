@@ -287,9 +287,8 @@ func (c *HelmChartClient) GetIndex() (*repo.IndexFile, error) {
 
 }
 
-func (c *HelmChartClient) ListReleases() (*[]release.Release, error) {
-
-	req, err := c.newRequest("GET", fmt.Sprintf("/api/helm/releases?ns=%s", c.namespace), nil)
+func (c *HelmChartClient) ListReleases(limitInfo bool) (*[]release.Release, error) {
+	req, err := c.newRequest("GET", fmt.Sprintf("/api/helm/releases?ns=%s&limitInfo=%s", c.namespace, limitInfo), nil)
 
 	if err != nil {
 		return nil, err

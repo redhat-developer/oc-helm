@@ -43,6 +43,6 @@ func newListCmd(commandLineOptions *options.CommandLineOption) *cobra.Command {
 
 		},
 	}
-
+	listCmd.Flags().BoolVarP(&commandLineOptions.LimitInfo, "limitInfo", "i", false, "specifies if call is made from topology or not")
 	return listCmd
 }
