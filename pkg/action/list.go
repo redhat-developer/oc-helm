@@ -21,9 +21,7 @@ func NewListAction(commandLineOptions *options.CommandLineOption) *ListAction {
 }
 
 func (l *ListAction) Run() error {
-
-	releases, err := l.helmChartClient.ListReleases()
-
+	releases, err := l.helmChartClient.ListReleases(l.commandLineOptions.LimitInfo)
 	if err != nil {
 		return err
 	}
