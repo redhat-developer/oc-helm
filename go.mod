@@ -6,6 +6,7 @@ require (
 	github.com/pkg/errors v0.9.1
 	github.com/spf13/cobra v1.4.0
 	helm.sh/helm/v3 v3.9.0
+	k8s.io/api v0.24.0
 	k8s.io/cli-runtime v0.24.0
 	k8s.io/helm v2.17.0+incompatible
 	sigs.k8s.io/yaml v1.3.0
@@ -92,7 +93,6 @@ require (
 	gopkg.in/inf.v0 v0.9.1 // indirect
 	gopkg.in/yaml.v2 v2.4.0 // indirect
 	gopkg.in/yaml.v3 v3.0.0-20210107192922-496545a6307b // indirect
-	k8s.io/api v0.24.0 // indirect
 	k8s.io/apimachinery v0.24.0 // indirect
 	k8s.io/client-go v0.24.0 // indirect
 	k8s.io/klog/v2 v2.60.1 // indirect

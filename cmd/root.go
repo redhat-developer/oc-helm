@@ -53,6 +53,7 @@ func newRootCmd(commandLineOptions *options.CommandLineOption) (*cobra.Command, 
 		newVerifyCmd(commandLineOptions),
 		newInstallAsyncCmd(commandLineOptions),
 		newUpgradeAsyncCmd(commandLineOptions),
+		newUninstallAsyncCmd(commandLineOptions),
 	)
 
 	return rootCmd, nil

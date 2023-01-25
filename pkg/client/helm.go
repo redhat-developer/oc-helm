@@ -16,6 +16,7 @@ import (
 	"helm.sh/helm/v3/pkg/chart"
 	"helm.sh/helm/v3/pkg/release"
 	"helm.sh/helm/v3/pkg/repo"
+	kv1 "k8s.io/api/core/v1"
 )
 
 const (
@@ -174,7 +175,7 @@ func (c *HelmChartClient) CreateRelease(releaseName string, chartUrl string, val
 
 }
 
-func (c *HelmChartClient) CreateReleaseAsync(releaseName string, chartUrl string, values map[string]interface{}, upgrade bool) (*types.ReleaseSecret, error) {
+func (c *HelmChartClient) CreateReleaseAsync(releaseName string, chartUrl string, values map[string]interface{}, upgrade bool) (*kv1.Secret, error) {
 
 	helmRequest := &types.HelmRequest{
 		Name:      releaseName,
@@ -196,9 +197,9 @@ func (c *HelmChartClient) CreateReleaseAsync(releaseName string, chartUrl string
 		return nil, err
 	}
 
-	var release types.ReleaseSecret
+	var secret kv1.Secret
 
-	_, helmClientError := do(c.httpClient, req, &release, true, true)
+	_, helmClientError := do(c.httpClient, req, &secret, true, true)
 
 	if helmClientError != nil {
 
@@ -209,7 +210,7 @@ func (c *HelmChartClient) CreateReleaseAsync(releaseName string, chartUrl string
 		return nil, fmt.Errorf("Failed to create release '%s': Status code: %d", releaseName, helmClientError.StatusCode)
 	}
 
-	return &release, nil
+	return &secret, nil
 
 }
 
@@ -269,6 +270,26 @@ func (c *HelmChartClient) Uninstall(releaseName string) (*release.UninstallRelea
 
 }
 
+func (c *HelmChartClient) UninstallAsync(releaseName, version string) (int, error) {
+
+	req, err := c.newRequest("DELETE", fmt.Sprintf("/api/helm/release/async?name=%s&ns=%s&version=%s", releaseName, c.namespace, version), nil)
+
+	if err != nil {
+		return -1, err
+	}
+	var uninstallResponse types.HelmClientError
+	_, helmClientError := do(c.httpClient, req, uninstallResponse, true, true)
+	if helmClientError != nil {
+		if helmClientError.StatusCode==204{
+			return helmClientError.StatusCode,nil
+		}else if helmClientError.HelmServerError != nil {
+			return helmClientError.StatusCode, fmt.Errorf("%s", helmClientError.HelmServerError.Error)
+		}
+		return helmClientError.StatusCode, fmt.Errorf("Failed to Uninstall release '%s': Status code: %d", releaseName, helmClientError.StatusCode)
+	}
+	return -1,nil
+
+}
 func (c *HelmChartClient) GetIndex() (*repo.IndexFile, error) {
 	req, err := c.newRequest("GET", fmt.Sprintf("/api/helm/charts/index.yaml?namespace=%s", c.namespace), nil)
 
