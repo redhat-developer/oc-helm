@@ -8,10 +8,10 @@ import (
 
 	"github.com/redhat-cop/oc-helm/pkg/client"
 	"github.com/redhat-cop/oc-helm/pkg/options"
-	"github.com/redhat-cop/oc-helm/pkg/types"
 	"github.com/redhat-cop/oc-helm/pkg/utils"
 	"helm.sh/helm/v3/pkg/release"
 	"helm.sh/helm/v3/pkg/repo"
+	kv1 "k8s.io/api/core/v1"
 )
 
 type HelmChartInstall struct {
@@ -167,6 +167,7 @@ func installChartAsync(helmChartInstall *HelmChartInstall) error {
 	return nil
 }
 
-func printReleaseDeploymentStatusAsync(w io.Writer, release *types.ReleaseSecret) {
-	fmt.Fprintf(w, "NAME: %s\n", release.SecretName)
+func printReleaseDeploymentStatusAsync(w io.Writer, secret *kv1.Secret) {
+	fmt.Fprintf(w, "NAME: %s\n", secret.ObjectMeta.Name)
+	fmt.Fprintf(w, "UID: %s\n", secret.ObjectMeta.UID)
 }
