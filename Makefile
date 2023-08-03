@@ -1,5 +1,4 @@
 export GO111MODULE ?= on
-export GOARCH      ?= amd64
 export CGO_ENABLED ?= 0
 
 INSTALL_PATH ?= /usr/local/bin
@@ -16,7 +15,7 @@ GOPATH    ?= $(shell go env GOPATH)
 BINDIR     := $(CURDIR)/bin
 BINNAME    := oc-helm
 DISTDIR    := ./_dist
-PLATFORMS  ?= darwin/amd64 windows/amd64 linux/amd64
+PLATFORMS  ?= darwin/amd64 linux/amd64 linux/386 linux/arm linux/arm64 linux/ppc64le windows/amd64
 
 VERSION_PACKAGE := $(REPOPATH)/pkg/version
 COMPRESS:=gzip --best -k -c
